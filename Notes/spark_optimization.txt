@@ -1,0 +1,101 @@
+SPARK TUNING:
+Data Serialization
+Java serialization: By default, Spark serializes objects using Java’s ObjectOutputStream framework, and can work with any class you create that implements java.io.Serializable. You can also control the performance of your serialization more closely by extending java.io.Externalizable. Java serialization is flexible but often quite slow, and leads to large serialized formats for many classes.
+Kryo serialization: Spark can also use the Kryo library (version 4) to serialize objects more quickly. Kryo is significantly faster and more compact than Java serialization (often as much as 10x), but does not support all Serializable types and requires you to register the classes you’ll use in the program in advance for best performance.
+
+Memory Tuning
+
+Level of Parallelism
+Parallel Listing on Input Paths
+Memory Usage of Reducer Tasks
+Broadcasting Variables
+Data Locality => PROCESS_LOCAL ,NODE_LOCAL , NO_PREF , RACK_LOCAL , ANY 
+File Formats
+
+
+SPARK SQL TUNING:
+
+Caching Data In Memory
+--spark.sql.inMemoryColumnarStorage.compressed,true
+--spark.sql.inMemoryColumnarStorage.batchSize,1000
+--spark.sql.files.maxPartitionBytes,128MB
+--spark.sql.shuffle.partitions,200
+
+"spark.shuffle.service.enabled", "true"
+
+Adaptive Query Execution
+Adaptive Query Execution (AQE) is an optimization technique in Spark SQL that makes use of the runtime statistics to choose the most efficient query execution plan. AQE is disabled by default. Spark SQL can use the umbrella configuration of spark.sql.adaptive.enabled to control whether turn it on/off. As of Spark 3.0, there are three major features in AQE, including coalescing post-shuffle partitions, converting sort-merge join to broadcast join, and skew join optimization.
+
+-->Coalescing Post Shuffle Partitions
+--spark.sql.adaptive.enabled
+--spark.sql.adaptive.coalescePartitions.enabled
+
+-->Converting sort-merge join to broadcast join
+--spark.sql.adaptive.localShuffleReader.enabled
+
+Data skew is a condition in which a table's data is unevenly distributed among partitions in the cluster. Data skew can severely downgrade performance of queries, especially those with joins. Joins between big tables require shuffling data and the skew can lead to an extreme imbalance of work in the cluster.
+-->Optimizing Skew Join
+--spark.sql.adaptive.skewJoin.enabled
+
+Coalesce Hints for SQL Queries
+Coalesce hints allows the Spark SQL users to control the number of output files just like the coalesce, repartition and repartitionByRange in Dataset API, they can be used for performance tuning and reducing the number of output files. The “COALESCE” hint only has a partition number as a parameter. The “REPARTITION” hint has a partition number, columns, or both of them as parameters. The “REPARTITION_BY_RANGE” hint must have column names and a partition number is optional.
+
+
+1> Multiple count operations on the same dataframe -- trivial step
+
+2> dataframe caching
+df.cache() = df.persist(StorageLevel.MEMORY_AND_DISK)
+df.persist(StorageLevel.MEMORY_AND_DISK_SER) -- takes less memory
+df.persist(StorageLevel.MEMORY_AND_DISK_3) -- caches the data with replication factor -2 ( spot instances )
+
+Unpersist when a dataframe served its purpose
+
+3> spark.sql.shuffle.partitions 2001 4 billion
+./bin/spark-submit --conf spark.sql.shuffle.partitions=2001
+
+4> reduce number of small files in source and target
+parquet standard - 250mb to 750mb
+
+streaming job -- 5 min 
+
+5> sc.hadoopConfiguration.set("mapreduce.fileoutputcommitter.algorithm.version", "2") 
+
+mapreduce.fileoutputcommitter.algorithm.version now defaults to 2.
+  
+In algorithm version 1: O(n)
+In algorithm version 2: O(1)
+commitTask, recoverTask, commitJob 
+
+$joboutput/_temporary/$appAttemptID/_temporary/$taskAttemptID/ --> $joboutput/
+and write $joboutput/_SUCCESS
+
+However, the window of vulnerability for having incomplete output in $jobOutput directory is much larger. 
+Therefore, pipeline logic for consuming job outputs should be built on checking for existence of _SUCCESS marker.
+
+6> cluster configuration --
+choose storage-optimized, memory-optimized or compute-optimized choose wisely
+
+m4
+
+7> parquet.metadata.read.parallelism 
+"fs.s3a.experimental.input.fadvise" "randome" for binary files
+
+df=spark.read.parquet('s3a//asd')
+df.count()
+
+
+
+
+
+
+21/06/10 06:54:17 WARN S3AbortableInputStream: Not all bytes were read from the S3ObjectInputStream, aborting HTTP connection. This is likely an error and may result in sub-optimal behavior. Request only the bytes you need via a ranged GET or drain the input stream after use.
+21/06/10 06:54:17 INFO S3AFileSystem: S3 configuration compatibility mode is enabled
+21/06/10 06:54:17 INFO S3AFileSystem: FS_CONF_COMPAT [UNSUPPORTED] Ignoring key fs.s3a.fast.buffer.size as unsupported
+21/06/10 06:54:17 INFO S3AFileSystem: FS_CONF_COMPAT [UPDATE] Both configuration keys fs.s3a.buffer.dir and fs.s3.buffer.dir are set, ignoring update
+21/06/10 06:54:17 WARN S3AFileSystem: Access denied: <actual-bucket-name>
+21/06/10 06:54:17 WARN S3AFileSystem: Falling back to the endpoint s3.amazonaws.com
+21/06/10 06:54:17 INFO S3AFileSystem: Max paging keys: maxKeys=5000
+21/06/10 06:54:17 INFO S3AFileSystem: Delete with limit configurations: deleteFileCountLimitEnabled=false, deleteFileCountLimit=-1, deleteTimeLimitEnabled=false, deleteTimeLimitMillis=-1, deleteTimeLimitBatchSize=-1
+21/06/10 06:54:17 INFO PrivaceraDBContextUtil:  Completed Method uniqueId = PRIVACERA_EXECUTE_REQUEST_FileScanRDD-1_executeRequest_1623308056983, timeTaken = 161, stageId = 1, taskAttemptId =25, attemptNumber = 0
+21/06/10 06:54:17 INFO AmazonHttpClient: Configuring Proxy. Proxy Host: prod-privacera-ds-ha-elb-cf-ad21ca7a0550221f.elb.us-east-1.amazonaws.com Proxy Port: 8181
+21/06/10 06:54:17 WARN PrivaceraDatabricksS3AFileSystem: failed to setEndpoint  Client is immutable when created with the builder

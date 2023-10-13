@@ -1,0 +1,468 @@
+DATA WAREHOUSE:(Bill Immon)
+Data Collection:
++----------------------------------+---------------------------------------+------------------------+--------------+
+|         Subject Oriented         |              Integrated               |      Time-variant      | Non-volatile |
++----------------------------------+---------------------------------------+------------------------+--------------+
+| analyze particular subject       | integrated with multiple data sources | tracking time by event | static       |
++----------------------------------+---------------------------------------+------------------------+--------------+
+|                                         Helping business decision-making                                         |
++----------------------------------+---------------------------------------+------------------------+--------------+
+
+RALPH-KIMBALL: A data warehouse is the copy of transcation data specifically structured for query and analysis.
+
+COMPONENTS of DATA WAREHOUSING:
++-------------+-----------------+--------------+-----------+--------------+------------+-------------------+
+|                                               Metadata Layer                                             |
++-------------+-----------------+--------------+-----------+--------------+------------+-------------------+
+| Data Source | Data Extraction | Staging area | ETL layer | Data Storage | Data Logic | Data Presentation |
++-------------+-----------------+--------------+-----------+--------------+------------+-------------------+
+|             |      System operation Layer                                                                |
++-------------+-----------------+--------------+-----------+--------------+------------+-------------------+
+Things to consider for building robust DW: Scalablity, Performance, Maintenance, Data Issue, Reruns, No expert requirements(easy & simple), Monitoring and alerts
+
+DATA SOURCE: Data feeded into data Warehouse from multiple data sources in different file formats ranging from
+flat .txtot to ORC files
+Daba Sources Can be,
+- Operational data like Sales data, HR Data, product data 
+- Web server logs
+- Internal Market research data
+- 3rd party data, Census data, demographics data.
+
+Data Extraction: Data being pulled from various data Sources into data Warehouse.
+- No data clean
+- No data transformation
+
+Staging area:
+This where data resides before data processing and data transformation activities.
+
+ETL Layer:
+- Data transformation happening in this layer transactional layer to analytical layer.
+- Data cleaning is happening.
+- Most time consuming phase.
+- ETL tool where used in this phase.
+
+Data Storage Layer:
+This is where cleaned a transformed data resides. Based on Stope & functionality 3 types of entities can be found.
+- Data warehouse
+- Data Mart
+- Operational Data Store (ODS)
+
+Data Logic Layer:
+Business rules are stored, these rules won't affect Underlying data transformation rules. It mainly focuses on reporting rules.
+
+Data Presentation Layer:
+This is where and users (or) business users consume the data. It may be in tabular form (0R) graphical form.
+
+Metadata layer:
+Information of the data being stored. 
+EG. Schema of the table. 
+
+System operational layer:
+This layer maintaining operational level logs, access control, System performance.
+
+What is cardinality?
+Thinking mathematically, it is the number of elements in a set. Thinking in the database world, cardinality has to do with the counts in a relationship, one-to-one, one-to-many, or many-to-many.
+
+DATA WAREHOUSING CONCEPTS:
+- Dimensional Data Model (STAR & SNOWFLAKE SCHEMA)
+- Slowly Changing Dimension Model
+- Conceptual Data Model
+- Logical Data Model.
+- Physical Data Model.
+- Conceptual, Logical and physical Data Model.
+
+Dimensional Data Model (DDM):
+It is a optimised data Storage technique which is used in Data Warehouse. The main propose of DIM is to store the data in such a
+way that data retrieval will be faster and analysed better. This can be achieved using fact and dimensional tables.
+DIM is more concentrated to read, analyse, summarize numeric information like values, balances, weights, counts etc. DDM is OLAP.
+In contrast OLTP is designed for frequent update, delete and inserts. 
+
+
++---------------+-----------------------------------------------------+--------------------------------------------------------+
+|     Topic     |                        OLAP                         |                 OLTP                                   |
++---------------+-----------------------------------------------------+--------------------------------------------------------+
+| Basic         | To manage database modification                     | Online data retrieving and analysing system            |
+| Focus         | Insert, Update, Delete the information in database  | Extract data that helps in decsision making            |
+| Data          | OLTP & it's transcation are original source of data | Diff multiple OLTP's becomes source of data for OLAP   |
+| Transcation   | OLTP has short transcation                          | OLAP has long transcation                              |
+| Time          | Processing time will be slow                        | Long processing time                                   |
+| Queries       | Simple queries                                      | Complex queries                                        |
+| Normalization | 3NF normalized                                      | Not normalised                                         |
+| Integrity     | Must maintain data integrity                        | Not frequently modified so data integrity not required |
++---------------+-----------------------------------------------------+--------------------------------------------------------+
+
+STAR schema:
+In the star schema design, a single object (the fact table) sits in the middle and is radically connected to other surrounding objects (dimension lookup tables) like a star. Each dimension is represented as a single table. The primary key in each dimension table is related to a foreign key in the fact table. All measures in the fact table are related to all the dimensions that fact table is related to. In other words, they all have the same level of granularity.
+
+SNOWFLAKE Schema:
+The snowflake schema is an extension of the star schema, where each point of the star explodes into more points. In a star schema, each dimension is represented by a single dimensional table, whereas in a snowflake schema, that dimensional table is normalized into multiple lookup tables, each representing a level in the dimensional hierarchy. For example, the Time Dimension that consists of 2 different hierarchies:
+1. Year → Month → Day
+2. Week → Day
+We will have 4 lookup tables in a snowflake schema: A lookup table for year, a lookup table for month, a lookup table for week, and a lookup table for day. Year is connected to Month, which is then connected to Day. Week is only connected to Day. 
+
+The main advantage of the snowflake schema is the improvement in query performance due to minimized disk storage requirements and joining smaller lookup tables. The main disadvantage of the snowflake schema is the additional maintenance efforts needed due to the increase number of lookup tables.
+
+
++-----------------------+------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|         Topic         |                                                            Star Schema                                                             |                                                                            Snowflake Schema                                                                             |
++-----------------------+------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Understandability     | Easier for business users and analysts to query data.                                                                              | Maybe more difficult for business users and analysts due to the number of tables they have to deal with.                                                                |
+| Dimension table       | Only has one dimension table for each dimension that groups related attributes. Dimension tables are not in the third normal form. | May have more than 1 dimension table for each dimension due to the further normalization of each dimension table.  Dimension tables are in the third normal form (3NF). |
+| Query complexity      | The query is very simple and easy to understand                                                                                    | More complex query due to multiple foreign keys joins between dimension tables                                                                                          |
+| Query performance     | High performance. The database engine can optimize and boost query performance based on a predictable framework.                   | More foreign key joins, therefore, the longer execution time of query in comparison with star schema                                                                    |
+| When to use           | When dimension tables store a relatively small number of rows, space is not a big issue we can use star schema.                    | When dimension tables store a large number of rows with redundancy data and space is such an issue, we can choose snowflake schema to save space.                       |
+| Foreign Key Joins     | Fewer Joins                                                                                                                        | A higher number of joins                                                                                                                                                |
+| Data warehouse system | Work best in any data warehouse/data mart                                                                                          | Better for small data warehouse/ data mart                                                                                                                              |
++-----------------------+------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+
+
+Elements of DDM:
+- Facts Tables
+- Dimension Tables
+
+Fact Tables:
+A fact table is the central table in a star schema or snowflake schema of a data warehouse. A fact table stores quantitative information, A fact table record captures a measurement or a metric. Eg. Sales_table with Date DIM, product DIM, stores DIM, units sold (quantitative measure)
+A fact table can store different types of measures such as additive, non-additive, semi-additive.
+Additive – As its name implied, additive measures are measures that can be added to all dimensions.
+Non-additive – different from additive measures, non-additive measures are measures that cannot be added to all dimensions.
+Semi-additive – semi-additive measures are the measure that can be added to only some dimensions and not across other.
+
+Additive measures are the ones on top of which all aggregation functions can be applied. For Example, units purchased.
+Non-additive measures are the ones on top of which no aggregation function can be applied. For Example, a ratio or a percentage column; a flag or an indicator column present in fact table holding values like Y/N, etc. is a non-additive measure.
+Semi- additive measures are the ones on top of which some (but not all) aggregation functions can be applied. For Example, fee rate or account balance.
+
+Types of fact tables:
+Transactional – Transactional fact table is the most basic one that each grain associated with it indicated as “one row per line in a transaction”, e.g., every line item appears on an invoice. Transaction fact table stores data of the most detailed level, therefore, it has a high number of dimensions associated with it.
+Periodic snapshots – Periodic snapshots fact table stores the data that is a snapshot in a period of time. The source data of the periodic snapshots fact table is data from a transaction fact table where you choose a period to get the output. Eg. courier tracking table
+Accumulating snapshots – The accumulating snapshots fact table describes the activity of a business process that has a clear beginning and end. This type of fact table, therefore, has multiple date columns to represent milestones in the process. A good example of accumulating snapshots fact table is the processing of a material. As steps towards handling the material are finished, the corresponding record in the accumulating snapshots fact table gets updated.
+
+Designing fact table steps,
+Choosing business process to a model – The first step is to decide what business process to model by gathering and understanding business needs and available data
+Declare the grain – by declaring a grain means describing exactly what a fact table record represents
+Choose the dimensions – once the grain of the fact table is stated clearly, it is time to determine dimensions for the fact table.
+Identify facts – identify carefully which facts will appear in the fact table.
+
+Factless Fact Table:
+By definition, the factless fact table is a fact table that does not contain any facts. There are two kinds of factless fact tables:
+- Factless fact table describes events or activities.
+- Factless fact table describes a condition, eligibility, or coverage.
+
+Factless fact table for event or activity
+When designing a dimensional model, we often find that we want to track events or activities that occur in our business process but we can’t find measures to track.  In these situations, we can create a transaction-grained fact table that has no facts to describe that events or activities. Even though there are no facts storing in the fact table, the event can be counted to produce very meaningful process measurements.
+
+Factless fact table for event or activity example
+For example, we may want to track employee leaves. How often and why employee leaves are very important for you to plan our daily activities and resources.
+
+At the center we will have the FACT_LEAVE (day_id, time_id, emp_id, leave_type) table that has no facts at all. However, the FACT_LEAVE table is used to measure employee leave the event when it occurs.
+
+Factless fact table for condition, eligibility, or coverage
+A factless fact table can be also used in these situations:
+
+Tracking salesperson assigned to each prospect or customer
+Logging the eligibility of employees for a compensation program
+Capturing the promotion campaigns that are active at specific times such as holidays.
+
+Those examples above describe conditions, eligibility, or coverage. The factless fact table can be used to model conditions, eligibility, or coverage.  Typically information is captured by this star will not be studied alone but used with other business processes to produce meaningful information.
+
+Let’s take a look at the sale star below. By looking only at the star, we don’t know what product has a promotion that did not sell.
+
+Fact_Sales (Fact table) -> product_id, store_id, date_id, promo_id, units_sold, dollor_cost
+Fact_promo (Factless Table) -> product_id, store_id, date_id, promo_id
+
+In order to answer the question: what product that has promotion did not sell, we need to do as follows:
+find out products that have promotions.
+find out products that have a promotion that sold.
+The difference is the list of products that have promotions but did not sell.
+
+DIMENSIONAL TABLES:
+In data warehousing, a dimension table is one of the companion tables to a fact table in the star schema. Different from a fact table that contains measures or business facts, a dimension table contains the textual descriptor of the business. The fields of the dimension table are designed to satisfy these two important requirements:
+- Query constraining/grouping/filtering.
+- Report labeling
+
+Dimension table example
+In the schema below we have 3 dimension tables Dim_Date, Dim_Store and Dim_Product surrounding the fact table Fact_Sales.
+
+Surrogate keys in dimension tables
+It is critical that the primary key’s value of a dimension table remains unchanged.  And it is highly recommended that all dimension tables use surrogate keys as primary keys.
+
+Surrogate keys are key generated and managed inside the data warehouse rather than keys extracted from data source systems.
+
+There are several advantages of using surrogate keys in dimension tables:
+Performance – join processing between dimension tables and fact table is much more efficient by using a single field surrogate key.
+Integration – in terms of data acquisition, the surrogate key allows integrating data from multiple data sources even if they lack consistent source keys.
+Manage version of data – keep track of changes in dimension field values in the dimension table.
+It is so important that the dimension tables should be designed in such a way that they can be shared between multiple data marts and cubes within a data warehouse. This ensures that the data warehouse provides consistent information for similar queries. And surrogate key must be used as the primary keys of dimension tables to enable the dimension tables to be shared easier.
+
+Slowly changing dimension:
+The "Slowly Changing Dimension" problem is a common one particular to data warehousing. In a nutshell, this applies to cases where the attribute for a record varies over time. 
+
+Type 0 – Fixed Dimension
+No changes allowed, dimension never changes
+
+Type 1: The new record replaces the original record. No trace of the old record exists.
+Advantages:
+- This is the easiest way to handle the Slowly Changing Dimension problem, since there is no need to keep track of the old information.
+Disadvantages:
+- All history is lost. By applying this methodology, it is not possible to trace back in history. 
+When to use: when it is not necessary for the data warehouse to keep track of historical changes.
+
+Type 2: A new record is added into the customer dimension table. Therefore, the customer is treated essentially as two people (meaning additional PK in dimension table)
+Advantages:
+- This allows us to accurately keep all historical information.
+Disadvantages:
+- This will cause the size of the table to grow fast. In cases where the number of rows for the table is very high to start with, storage and performance can become a concern.
+- This necessarily complicates the ETL process.
+When to use: when it is necessary for the data warehouse to track historical changes.
+
+Type 3: The original record is modified to reflect the change. In Type 3 Slowly Changing Dimension, there will be two columns to indicate the particular attribute of interest, one indicating the original value, and one indicating the current value. There will also be a column that indicates when the current value becomes active.
+CustomerKey, Name, Original_State, Current_state, Effective_from
+Advantages:
+- This does not increase the size of the table, since new information is updated.
+- This allows us to keep some part of history.
+Disadvantages:
+- Type 3 will not be able to keep all history where an attribute is changed more than once. 
+When to use: Type III slowly changing dimension should only be used when it is necessary for the data warehouse to track historical changes, and when such changes will only occur for a finite number of time.
+
+Type 4: Historical table created
+
+Conformed Dimension:
+This dimension is shared among multiple subject areas or data marts. Same can be used in different projects without any modifications done in the same. This is used to maintain consistency. Conformed dimensions are those which are exactly same or a proper subset of any other dimension.
+The time dimension is a common conformed dimension in an organization. Customer dim table
+
+Degenerated Dimension: A degenerated dimension is a dimension that is not a fact but presents in the fact table as a primary key. It does not have its own dimension table. We can also call it as a single attribute dimension table.
+But, instead of keeping it separately in a dimension table and putting an additional join, we put this attribute in the fact table directly as a key. Since it does not have its own dimension table, it can never act as a foreign key in the fact table.
+
+Junk Dimension
+In data warehouse design, frequently we run into a situation where there are yes/no indicator fields in the source system. Through business analysis, we know it is necessary to keep such information in the fact table. However, if keep all those indicator fields in the fact table, not only do we need to build many small dimension tables, but the amount of information stored in the fact table also increases tremendously, leading to possible performance and management issues.
+
+Junk dimension is the way to solve this problem. In a junk dimension, we combine these indicator fields into a single dimension. This way, we'll only need to build a single dimension table, and the number of fields in the fact table, as well as the size of the fact table, can be decreased. The content in the junk dimension table is the combination of all possible values of the individual indicator fields.
+
+FACT TABLE COLS: cust_id, product_id, txn_id, store_id, txn_code, coupon_ind, prepay_ind, txn_amt
+In this fact table txn_code, coupon_ind, prepay_ind dimensions are enum_data type and can be stored in all possible combination in diff dim table as junk dimension
+JUNK DIM TABLE: junk_id, txn_code, coupon_ind, prepay_ind
+POST FACT_TABLE: cust_id, product_id, txn_id, store_id, junk_id, txn_amt
+
+Roleplay Dimension
+The having multiple relationships with the fact table are called role-play dimension. In other words, it is when the same dimension key with all its related attributes is joined to many foreign key presents in the fact table. It can fulfil multiple purposes within the same existing database.
+
+Conceptual Data Model:
+A conceptual data model identifies the highest-level relationships between the different entities. Features of conceptual data model include:
+
+- Includes the important entities and the relationships among them.
+- No attribute is specified.
+- No primary key is specified.
+
+Logical Data Model:
+A logical data model describes the data in as much detail as possible, without regard to how they will be physical implemented in the database. Features of a logical data model include:
+
+- Includes all entities and relationships among them.
+- All attributes for each entity are specified.
+- The primary key for each entity is specified.
+- Foreign keys (keys identifying the relationship between different entities) are specified.
+- Normalization occurs at this level.
+
+The steps for designing the logical data model are as follows:
+
+- Specify primary keys for all entities.
+- Find the relationships between different entities.
+- Find all attributes for each entity.
+- Resolve many-to-many relationships.
+- Normalization.
+
+Physical Data Model:
+Physical data model represents how the model will be built in the database. A physical database model shows all table structures, including column name, column data type, column constraints, primary key, foreign key, and relationships between tables. Features of a physical data model include:
+
+-Specification all tables and columns.
+- Foreign keys are used to identify relationships between tables.
+- Denormalization may occur based on user requirements.
+- Physical considerations may cause the physical data model to be quite different from the logical data model.
+- Physical data model will be different for different RDBMS. For example, data type for a column may be different between MySQL and SQL Server.
+
+The steps for physical data model design are as follows:
+
+- Convert entities into tables.
+- Convert relationships into foreign keys.
+- Convert attributes into columns.
+- Modify the physical data model based on physical constraints / requirements.
+
+Data Modeling - Conceptual, Logical, And Physical Data Models:
++----------------------+------------+---------+----------+
+|       Feature        | Conceptual | Logical | Physical |
++----------------------+------------+---------+----------+
+| Entity Names         | ✓          | ✓       |          |
+| Entity Relationships | ✓          | ✓       |          |
+| Attributes           |            | ✓       |          |
+| Primary Keys         |            | ✓       | ✓        |
+| Foreign Keys         |            | ✓       | ✓        |
+| Table Names          |            |         | ✓        |
+| Column Names         |            |         | ✓        |
+| Column Data Types    |            |         | ✓        |
++----------------------+------------+---------+----------+
+
+Data Integrity:
+Data integrity refers to the validity of data, meaning data is consistent and correct. In the data warehousing field, we frequently hear the term, "Garbage In, Garbage Out." If there is no data integrity in the data warehouse, any resulting report and analysis will not be useful.
+
+Entity (Row) Integrity: Avoids duplicate rows in tables.
+Domain (Column) Integrity: Restricts the type, format, or range of values to enforce valid entries.
+Referential Integrity: Ensures rows used by other records cannot be deleted.
+User-Defined Integrity: Enforces rules set by the user that do not fall into the other categories.
+
+In a data warehouse or a data mart, there are three areas of where data integrity needs to be enforced:
+
+Database level:
+We can enforce data integrity at the database level. Common ways of enforcing data integrity include:
+
+Referential integrity
+The relationship between the primary key of one table and the foreign key of another table must always be maintained. For example, a primary key cannot be deleted if there is still a foreign key that refers to this primary key.
+Primary key / Unique constraint
+Primary keys and the UNIQUE constraint are used to make sure every row in a table can be uniquely identified.
+Not NULL vs. NULL-able
+For columns identified as NOT NULL, they may not have a NULL value.
+Valid Values
+Only allowed values are permitted in the database. For example, if a column can only have positive integers, a value of '-1' cannot be allowed.
+
+ETL process
+For each step of the ETL process, data integrity checks should be put in place to ensure that source data is the same as the data in the destination. Most common checks include record counts or record sums.
+
+Access level
+We need to ensure that data is not altered by any unauthorized means either during the ETL process or in the data warehouse. To do this, there needs to be safeguards against unauthorized access to data (including physical access to the servers), as well as logging of all data access history. Data integrity can only ensured if there is no unauthorized access to the data.
+
+Database Normalization:
+In relational database design, we not only want to create a structure that stores all of the data, but we also want to do it in a way that minimize potential errors when we work with the data. The default language for accessing data from a relational database is SQL. In particular, SQL can be used to manipulate data in the following ways: insert new data, delete unwanted data, and update existing data. Similarly, in an un-normalized design, there are 3 problems that can occur when we work with the data:
+
+INSERT ANOMALY: This refers to the situation when it is impossible to insert certain types of data into the database.
+DELETE ANOMALY: The deletion of data leads to unintended loss of additional data, data that we had wished to preserve.
+UPDATE ANOMALY: This refers to the situation where updating the value of a column leads to database inconsistencies (i.e., different rows on the table have different values).
+
+To address the 3 problems above, we go through the process of normalization. When we go through the normalization process, we increase the number of tables in the database, while decreasing the amount of data stored in each table. There are several different levels of database normalization:
+
+1st Normal Form (1NF)
+2nd Normal Form (2NF)
+3rd Normal Form (3NF)
+Bryce-Codd Normal Form (BCNF)
+4th Normal Form (4NF)
+5th Normal Form (5NF)
+The opposite of normalization is denormalization, where we want to combine multiple tables together into a larger table. Denormalization is most frequently associated with designing the fact table in a data warehouse.
+
+1st Normal Form Definition:
+A database is in first normal form if it satisfies the following conditions:
+- Contains only atomic values
+- There are no repeating groups
+An atomic value is a value that cannot be divided. For example, in the table shown below, the values in the [Color] column in the first row can be divided into "red" and "green", hence [TABLE_PRODUCT] is not in 1NF.
+
+A repeating group means that a table contains two or more columns that are closely related. For example, a table that records data on a book and its author(s) with the following columns: [Book ID], [Author 1], [Author 2], [Author 3] is not in 1NF because [Author 1], [Author 2], and [Author 3] are all repeating the same attribute.
+
+1st Normal Form Example
+How do we bring an unnormalized table into first normal form? Consider the following example:
++------------+-------------+-------+
+| Product_id |   Colour    | Price |
++------------+-------------+-------+
+|          1 | red, green  |    33 |
+|          2 | yellow      |    45 |
+|          3 | blue, black |    65 |
+|          4 | black       |    13 |
+|          5 | white       |    52 |
+|          6 | orange      |    15 |
++------------+-------------+-------+
++------------+--------+  +------------+--------+
+| Product_id | Price  |  | Product_id | Colour |
++------------+--------+  +------------+--------+
+|          1 | 33     |  |          1 | red    |
+|          2 | 45     |  |          1 | green  |
+|          3 | 65     |  |          2 | yellow |
+|          4 | 13     |  |          3 | blue   |
+|          5 | 52     |  |          3 | black  |
+|          6 | 15     |  |          4 | black  |
++------------+--------+  |          5 | white  |
+                         |          6 | orange |
+                         +------------+--------+
+
+2nd Normal Form Definition:
+A database is in second normal form if it satisfies the following conditions:
+- It is in first normal form
+- All non-key attributes are fully functional dependent on the primary key
+
+In a table, if attribute B is functionally dependent on A, but is not functionally dependent on a proper subset of A, then B is considered fully functional dependent on A. Hence, in a 2NF table, all non-key attributes cannot be dependent on a subset of the primary key. Note that if the primary key is not a composite key, all non-key attributes are always fully functional dependent on the primary key. A table that is in 1st normal form and contains only a single key as the primary key is automatically in 2nd normal form.
+
+2nd Normal Form Example
++-------------+----------+----------------+
+| Customer_ID | Store_id | Store_location |
++-------------+----------+----------------+
+|           1 |        1 | Los Angels     |
+|           1 |        3 | San Fransico   |
+|           2 |        1 | Los Angels     |
+|           3 |        2 | New York       |
+|           4 |        3 | San Fransico   |
++-------------+----------+----------------+
+This table has a composite primary key [Customer ID, Store ID]. The non-key attribute is [Purchase Location]. In this case, [Purchase Location] only depends on [Store ID], which is only part of the primary key. Therefore, this table does not satisfy second normal form.
++-------------+----------+  +----------+-------------------+
+| customer_id | store_id |  | store_id | purchase_location |
++-------------+----------+  +----------+-------------------+
+|           1 |        1 |  |        1 | Los Angels        |
+|           1 |        3 |  |        2 | New York          |
+|           2 |        1 |  |        3 | San Fransico      |
+|           3 |        2 |  +----------+-------------------+
+|           4 |        3 | 
++-------------+----------+  
+
+3rd Normal Form Definition:
+A database is in third normal form if it satisfies the following conditions:
+
+It is in second normal form
+There is no transitive functional dependency
+By transitive functional dependency, we mean we have the following relationships in the table: A is functionally dependent on B, and B is functionally dependent on C. In this case, C is transitively dependent on A via B.
+
+3rd Normal Form Example
++---------+-----------+-------------+-------+
+| book_id | genere_id | genere_type | price |
++---------+-----------+-------------+-------+
+|       1 |         1 | Gardening   |    12 |
+|       2 |         2 | Sports      |    45 |
+|       3 |         1 | Gardening   |    23 |
+|       4 |         3 | Travel      |    76 |
+|       5 |         2 | Sports      |    25 |
++---------+-----------+-------------+-------+
+In the table able, [Book ID] determines [Genre ID], and [Genre ID] determines [Genre Type]. Therefore, [Book ID] determines [Genre Type] via [Genre ID] and we have transitive functional dependency, and this structure does not satisfy third normal form.
+
+To bring this table to third normal form, we split the table into two as follows:
++---------+-----------+-------+  +-----------+-------------+
+| book_id | genere_id | price |  | genere_id | genere_type |
++---------+-----------+-------+  +-----------+-------------+
+|       1 |         1 |    12 |  |         1 | Gardening   |
+|       2 |         2 |    45 |  |         2 | Sports      |
+|       3 |         1 |    23 |  |         3 | Travel      |
+|       4 |         3 |    76 |  +-----------+-------------+
+|       5 |         2 |    25 | 
++---------+-----------+-------+
+
+What are SQL Constraints?
+NOT NULL: Prevents a column from having a NULL value.
+DEFAULT: Specifies a default value for a column where none is specified.
+PRIMARY KEY: Uniquely identifies rows/records within a database table.
+FOREIGN KEY: Uniquely identifies rows/records from external database tables.
+UNIQUE: Ensures all values are unique.
+CHECK: Checks values within a column against certain conditions.
+INDEX: Quickly creates and retrieves data from a database.
+
+List out a few common mistakes encountered during Data Modelling?
+
+Few common mistakes encountered during Data Modelling are:
+Building massive data models: Large data models are like to have more design faults. Try to restrict your data model to not more than 200 tables.
+Lack of purpose: If you do not know that what is your business solution is intended for, you might come up with an incorrect data model. So having clarity on the business purpose is very important to come up with the right data model.
+Inappropriate use of surrogate keys: Surrogate key should not be used unnecessarily. Use surrogate key only when the natural key cannot serve the purpose of a primary key.
+Unnecessary de-normalization: Don’t denormalize until and unless you have a solid & clear business reason to do so because de-normalization creates redundant data which is difficult to maintain.
+
+What is the number of child tables that can be created out from a single parent table?
+
+Answer: The number of child tables that can be created out of the single parent table is equal to the number of fields/columns in the parent table that are non-keys.
+
+What’s the Difference Between forwarding and Reverse Engineering, in the Context of Data Models?
+Forward engineering is a process where Data Definition Language (DDL) scripts are generated from the data model itself. DDL scripts can be used to create databases. Reverse Engineering creates data models from a database or scripts. Some data modeling tools have options that connect with the database, allowing the user to engineer a database into a data model.
+
+Q35) What is forward engineering in a data model?
+Forward Engineering is a process by which DDL scripts are generated from the data model. Data modeling tools have options to create DDL scripts by connecting with various databases. With these scripts, databases can be created.
+
+Q36) What is reverse engineering in a data model?
+Reverse Engineering is a process useful for creating data models from databases or scripts. Data modeling tools have options to connect to the database by which we can reverse engineer a database into a data model.
+

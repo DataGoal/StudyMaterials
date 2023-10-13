@@ -1,0 +1,416 @@
+References:
+https://leetcode.com/problem-list/leetcode-curated-sql-70/?page=1
+https://leetcode.com/discuss/interview-question/1079822/Amazon-or-Data-Engineer-or-Phone-Interview-or-Seattle-or-AWS-or-L5
+https://leetcode.com/discuss/interview-question/1017328/Amazon-Data-Engineering-Phone-Interview-Questions
+https://leetcode.com/discuss/interview-question/1297084/Amazon-or-Data-Engineer
+https://leetcode.com/discuss/interview-question/456001/Amazon-Data-Scientist-Tech-Interview-SQL-%2B-Coding-Questions
+https://leetcode.com/discuss/interview-question/606844/Amazon-Data-Analyst-SQL-Interview-Questions
+
+
+Q. Give me the list of actors who have acted together most number of times.
+
+Actor1|Actor2|Movie
+-------|-------|---------
+B   | A     | Movie1
+B   | C     | Movie2
+B   | C     | Movie3
+A   | B     | Movie4
+A   | B     | Movie5  
+
+
+WITH tab1 AS (
+SELECT actor1, COUNT(a.actor1) FROM table1 WHERE actor1 IN (SELECT actor2 FROM table1) GROUP BY actor1, movies
+
+)   
+
+
+
+
+Q: Find top 2 teams who won maximum matches consecutively (in consecutive years).
+
+Team  | Year won |
+Seahawks|2007
+49ers |2010
+49ers |2011
+49ers |2014
+Cardinals |2005
+Seahawks|2006
+Seahawks|2008
+
+SELECT abc.TEAM, YEARDIFF(YEAR_WON,NEXT_YEAR_WON) AS YEAR_DIFF FROM (
+SELECT TEAM, YEAR_WON, LAG(TEAM_WON, 1) OVER(PARTITION BY TEAM ORDER BY YEAR_WON) 
+AS NEXT_YEAR_WON FROM tab HAVING YEARDIFF(YEAR_WON,NEXT_YEAR_WON) = 1 ) GROUP BY 1, 2
+
+
+Q:  Provide me the tournament that is played consistently in all the years that this table has the data.
+    (Data provided here is sample and can contain x years of data)
+
+create table books
+(
+    id INT NOT NULL,
+    titel nvarchar(256),
+    type varchar(256),
+    author_id INT,
+    editor_id INT,
+    translator_id INT
+)
+
+CREATE TABLE playertable
+(
+    player varchar(256),
+    years int,
+    tournament varchar(256),
+    otype varchar(256),
+    orank int,
+    prize varchar(256)
+);
+
+-- sample data:
+
+Player | Year | Tournament Name | Rank | Prize Money
+Andy   | 2015 | US Open         | 1    |   $1000
+Jim    | 2015 | US Open         | 2    |   $800
+Mayur  | 2015 | US Open         | 3    |   $500
+Roger  | 2015 | AUS Open        | 1    |   $1000
+Andy   | 2015 | AUS Open        | 2    |   $500
+Andy   | 2016 | US Open         | 1    |   $3000
+Sam    | 2016 | US Open         | 2    |   $1500
+Jim    | 2017 | Wimbledon	    | 1    |   $1500
+Andy   | 2017 | Wimbledon       | 2    |   $800
+Jim    | 2017 | US Open         | 1    |   $3000
+Sam    | 2017 | US Open         | 2    |   $1500
+Jim    | 2017 | French Open     | 1    |   $1500
+Andy   | 2017 | French Open     | 2    |   $800
+Jim    | 2018 | US Open         | 1    |   $1000
+Sam    | 2018 | US Open         | 2    |   $300
+Roger  | 2018 | AUS Open        | 1    |   $1000
+Andy   | 2018 | AUS Open        | 2    |   $500
+
+WITH cte AS (SELECT player, COUNT(years) FROM playertable GROUP BY player HAVING count(years) > COUNT(DISTINCT years)),
+cte2 AS (SELECT player, years FROM playertable WHERE player IN (SELECT player FROM cte))
+SELECT * FROM cte2 c RIGHT JOIN playertable p ON c.player = p.player AND c.years = p.years;
+
+Python Questions:
+
+Q. Write a function that returns the cumulative sum of elements in a Python list. 
+For example:
+input_list = [9, 1, 3] 
+
+result_list = [9, 10, 13]
+
+def cumliativeSum(list):
+    list = []
+    counter = 0
+    for i in range (0, len(list)):
+        counter = counter + list[i]
+    return list.append(counter)
+    
+
+
+Q. Write a function that takes a number and returns a list of digits.
+For example:
+input_number = 3217   OR AXEFLNM  OR dasf3dfvg4!@#
+
+result_list = [3, 2, 1, 7]    [d,a,s,f,3,d,f,v,g,4]  [!,@,#]
+
+def listGenerate(num):
+    
+    ls = []
+    ls2 = []
+    for i in num:
+        if i.isalnum:
+            ls.append(str(i))
+        else:
+            ls2.append(str(i))
+    return ls    
+
+
+
+Q: Write a code to flattened below JSON object.
+A flattened json is nothing but there is no nesting is present and only key-value pairs are present.
+
+[
+  {
+    "_id": "5973782bdb9a930533b05cb2",
+    "isActive": true,
+    "balance": "$1,446.35",
+    "age": 32,
+    "eyeColor": "green",
+    "name": "Logan Keller",
+    "gender": "male",
+    "company": "TESTCOMPANY",
+    "email": "logankeller@testcompany.com",
+    "phone": "+1 (900) 333-2238",
+	"favoritenumbers": [79, 102]
+    "friends": [
+      {
+        "id": 0,
+        "name": "Colon Salazar"
+      },
+      {
+        "id": 1,
+        "name": "French Coole"
+      },
+      {
+        "id": 2,
+        "name": "Jake Martin"
+      }
+    ],
+    "favoriteFruit": ["banana", "apple", "mandgo"]
+  }
+]
+
+final = {}
+
+def flattenJson (jString: str, name = ''):
+    if type(jString) is dict:
+        for i in jString:
+            flatten(jString[i], name + str(i) + '_')
+    elif tpye(jString) is list:
+        counter = 0
+        for j in jString:
+            flatten(j, jString + str(i) + '_')
+            counter = counter + 1
+    else:
+        final[jString[:-1]] = x
+        
+    flattenJson(jString)
+    return final
+
+
+
+
+
+
+Q - list of Books prices  = [10,15,2,3,4,25]
+Max budget = 25 
+#Returns maximum no of books that you can buy using this budget
+
+def soln(book,mb): 
+    books_sorted  = sorted(book)
+    # [2,3,4,10,15,25]
+    items = 0
+    max_size = 0
+    for i in book:
+        
+        mb = mb - i   
+        if mb < i:
+            max_size = items
+            break
+        else:
+            items = items + 1
+    return max_size
+
+Q -Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.
+
+You may assume that each input would have exactly one solution, and you may not use the same element twice.
+
+You can return the answer in any order.
+
+Input: nums = [2,7,11,15], target = 9
+Output: [0,1]
+Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].
+
+def soln(nums,target):
+    #Output is list of 2 elements with index of the elements that make the target 
+    dict = {}
+    for k, v in enumerate(nums, 0):
+        if (target - v) in d:
+            return d[target-v], k
+        else:
+            d[v] = k
+            
+Q - Two strings 
+s1 = "This is sentence One"
+s2 = 'This is sentence Two'
+
+Return the number of words that match in 2 strings
+def soln(s1,s2): 
+    s3 = s1 +' ' + s2
+    dict = {}
+    ls = []
+    for i in s3.split(' '):
+        if i not in dict:
+            d[i] = 1
+        else:
+            d[i] += 1
+            
+#dict = {'This': 2. 'is':2, 'sentence':2, 'One:'1 ,"Two":1 }
+
+            
+    for k,v in d.items():
+        if v > 1:
+            ls.append(k)
+    return len(ls) 
+    
+    
+    
+    
+    Data Model For Prime video
+    
+    Business need:
+    1. Available movies in prime DB
+    2. Search enginge
+    3. Capture counts of pause, buffer, play
+    4. Movie metadata
+    5. Reporting the metrics of users watched like how many hrs, buffers, free videos, paid video
+    
+    Defining facts and trascation tables
+    
+    UserFacts:
+    userID FK
+    primeID FK
+    sessionID FK
+    DeviceID FK
+    paymentsID FK
+    
+    
+    Dimensions:
+    tab1
+    userID PK
+    userName
+    userEmail
+    Adress
+    PhoneNumber
+    Password
+    
+    tab2
+    primeID PK
+    fromDate
+    endDate
+    planDetails
+    cost
+    
+    tab3
+    sessionID PK
+    movied ID FK
+    SessionMovieSeacrhName
+    sessionstarttime
+    sessionendtime
+    sessionNoOfbuffers
+    sessionNoOfPlays
+    sessionNoOfFree
+    
+    
+    FACTS for Movies:
+    movieID FK
+    
+    Dim table for movies
+    MovieID PK
+    movieGenere
+    MovieRating
+    MovieReleaseDate
+    movieLength
+    
+    --SQL - Akhil 
+    
+    Table schema \
+\
+ORDERS\
+    order_id varchar(30) composite primary key\
+    customer_id numeric(38,0)\
+    order_datetime timestamp\
+    item_id varchar(10) composite primary key \
+    order_quantity numeric(38,0)\
+\
+Sample extract from ORDERS 	\
+-----------------------------------------------------------------------------\
+order_id | customer_id |      order_datetime      | item_id | order_quantity\
+-----------------------------------------------------------------------------\
+A-001    | 32483       |  2018-12-15 09:15:22     |  B000   |   3\
+A-005    | 21456       |  2019-01-12 09:28:35     |  B001   |   1\
+A-005    | 21456       |  2019-01-12 09:28:35     |  B005   |   1\
+A-006    | 42491       |  2019-01-16 02:52:07     |  B008   |   2 \
+\
+	\
+ITEMS\
+    item_id varchar(10) primary key\
+    item_category varchar(20)\
+\
+    \
+Sample extract from ITEMS \
+------------------------\
+item_id | item_category\
+------------------------\
+B000    | Outdoors\
+B001    | Outdoors\
+B002    | Outdoors\
+B003    | Kitchen\
+B004    | Kitchen\
+\
+    
+Q: How many UNITS have been ordered yesterday? UNITS is the total quantity ordered.  \
+Output as:    Units\   
+    
+R:
+SELECT SUM(order_quantity) AS units FROM orders WHERE order_datetime = DATE_SUB(CURRENT_DATE, interval 1 day)
+
+\
+Q: How many UNITS have been ordered in the last 7 days (including today) in EACH and EVERY category? \
+Please consider SEVEN calendar days in total, including today.  \
+Please consider ALL categories, even those which have zero orders.  \
+Output as: 	Category    Units \
+\
+
+SELECT item_category, COUNT(CASE WHEN order_quantity IS NULL THEN 0 ELSE order_quantity END) AS units
+FROM items i LEFT JOIN orders o ON o.item_id = i.item_id WHERE order_datetime BETWEEN CURRENT_DATE AND DATE_SUB(CURRENT_DATE, interval 7 day)
+GROUP BY 1
+    
+
+Q: It is possible for customers to place multiple orders on a single date.  \
+For ALL customers, write a query to get the earliest ORDER_ID for each customer for each date they placed an order. \
+Output as:    Customer_id  Order_date   First_order_id \    
+
+SELECT customer_id, CAST (order_datetime AS date) AS Order_date, order_id AS First_order_id FROM (SELECT *,
+DENSE_RANK() OVER(PARTITION BY customer_id, CAST (order_datetime AS date) ORDER BY CAST (order_datetime AS date)) AS rnk FROM orders) AS abc WHERE abc.rnk = 1      
+    
+    
+Q: Write a query to get the second earliest ORDER_ID for each customer for each date they placed AT LEAST two orders. \
+Output as:    Customer_id  Order_date   Second_order_id \
+    
+    
+SELECT customer_id, CAST (order_datetime AS date) AS Order_date, order_id AS First_order_id FROM (SELECT *,
+DENSE_RANK() OVER(PARTITION BY customer_id, CAST (order_datetime AS date) ORDER BY CAST (order_datetime AS date)) AS rnk FROM orders) AS abc WHERE abc.rnk = 2
+
+Sample extract from ORDERS 	\
+-----------------------------------------------------------------------------\
+order_id | customer_id |      order_datetime      | item_id | order_quantity\
+-----------------------------------------------------------------------------\
+A-001    | 32483       |  2018-12-15 09:15:22     |  B001 - X   |   3\
+A-005    | 21456       |  2019-01-12 09:28:35     |  B001 - X   |   1\
+A-005    | 21456       |  2019-01-12 09:28:35     |  B005 - Y   |   1\
+A-006    | 42491       |  2019-01-16 02:52:07     |  B005 - Y   |   2 \
+A-007    | 42491       |  2019-01-17 02:52:07     |  B005 - Y   |   2 \
+\
+    
+Q: Write a query to create affinity of items. Affinity is defined as the probablity of two items being purchased together in a single order.    
+
+Output As - Item X | Item Y | Affinity Probability    
+------------B001 | B005 | 1 | 4 | 0.25
+ 
+Affinity Probability = Numerator / Denominator
+
+B000 B000 100%
+
+Denominator = count of all distinct items ;
+
+Numerator = Total number of orders where both Item X and Y were purchased.
+Denominator = Total number of orders where either Item X or Item Y was purchased. 
+
+
+Ordering the table to calculate using lag function to identify previous record
+
+Output As - Item X | Item Y | Numberator | Denominator | Affinity Probability   
+
+WITH cte AS(
+SELECT CASE WHEN i1.item_id EXIST IN ()
+)
+
+
+SELECT i1.item_id, i2.item_id, COUNT(i1.item_id)/COUNT(DISTINCT i2.item_id) FROM items i1 JOIN items i2 
+ON i1.item_id <> i2.item_id GROUP BY order_id
+
+
+
+
+    

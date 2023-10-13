@@ -1,0 +1,25 @@
+Distributed system fundamentals:
+Data Durability and Consistency
+Replication
+Partitioning
+Orchestrate
+
+Cardinality’s:
+the number of distinct values in a table column relative to the number of rows in the tablecardinality means whether a relationship is one-to-one, many-to-one, or many-to-many. High and Low Database Cardinality. 
+
+Normalization:
+First Normal Form – The information is stored in a relational table with each column containing atomic values. There are no repeating groups of columns. Eg Split sales & customer table
+Second Normal Form – The table is in first normal form and all the columns depend on the table’s primary key. Eg. removing columns which non    
+Third Normal Form – the table is in second normal form and all of its columns are not transitively dependent on the primary key 
+
+Type1: This method overwrites old with new data, and therefore does not track historical data.
+Type2: This method tracks historical data by creating multiple records for a given natural key in the dimensional tables with separate surrogate keys and/or different version numbers. Unlimited history is preserved for each insert.
+Type3: This method tracks changes using separate columns and preserves limited history. The Type 3 preserves limited history as it is limited to the number of columns designated for storing historical data. The original table structure in Type 1 and Type 2 is the same but Type 3 adds additional columns. In the following example, an additional column has been added to the table to record the supplier's original state - only the previous history is stored.
+Type 4: The Type 4 method is usually referred to as using "history tables", where one table keeps the current data, and an additional table is used to keep a record of some or all changes. Both the surrogate keys are referenced in the fact table to enhance query performance.
+
+Source
+File directory structure (source, valid, invalid, landing, final)
+Logging table
+Data trasformation
+Data Aggregartion
+Validation
