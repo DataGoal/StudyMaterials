@@ -79,7 +79,6 @@ def quickSortDesc(arr):
 
 
 
-
 if __name__ == '__main__':
     print(avgOfList([1, 4, 6, 8, 9]))
     print(maxInList([7, 2, 14, 6]))
