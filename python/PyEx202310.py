@@ -78,6 +78,21 @@ def quickSortDesc(arr):
     return right + middle + left
 
 
+def findChar(aStr, toFind):
+    lst = []
+
+    for i in range(len(aStr)-(len(toFind)-1)):
+        lst.append(aStr[i:i+len(toFind)])
+    print(lst)
+    if toFind in lst:
+        return True
+    else:
+        return False
+
+# https://leetcode.com/problems/sort-colors/
+
+
+# https://leetcode.com/problems/maximum-subarray/
 
 if __name__ == '__main__':
     print(avgOfList([1, 4, 6, 8, 9]))
@@ -87,4 +102,9 @@ if __name__ == '__main__':
     print(sortListDesc([34, 33, 42, 5, 21]))
     print(quickSortAsc([34, 33, 42, 5, 21]))
     print(quickSortDesc([34, 33, 42, 5, 21]))
+    print(findChar('sunmoonno','nn'))
+
+
+
+
 
