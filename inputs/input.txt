@@ -1,0 +1,29 @@
+----------------------------------------------
+-- DDL Statements for Table "stage"."cus_table"
+
+CREATE TABLE "stage"."cus_table" (
+    "FIRST_NAME" VARCHAR(255 OCET) NOT NULL,
+    "LAST_NAME" VARCHAR(25 OCET) NOT NULL,
+    "AGE" INTEGER NOT NULL,
+    "GENDER" CHAR(1) NOT NULL WITH DEFAULT 'M'
+)
+COMPRESS YES ORGANIZED BY ROW;
+
+ALTER TABLE "stage"."cus_table" ADD CONSTRAINT "PK_NAME" PRIMARY KEY ("FIRST_NAME") ENFORCED;
+
+----------------------------------------------
+-- DDL Statements for Table "stage"."emp_table"
+
+CREATE TABLE "stage"."emp_table" (
+    "EMP_FIRST_NAME" VARCHAR(255 OCET) NOT NULL,
+    "EMP_LAST_NAME" VARCHAR(25 OCET) NOT NULL,
+    "AGE" INTEGER NOT NULL,
+    "GENDER" CHAR(1) NOT NULL WITH DEFAULT 'M',
+    "TEST" VARCHAR(22 OCET) NOT NULL WITH DEFAULT "Yes",
+    "DT" TIMESTAMP NOT NULL WITH DEFAULT CURRENT TIMESTAMP
+)
+COMPRESS YES ORGANIZED BY ROW;
+
+ALTER TABLE "stage"."cus_table" ADD CONSTRAINT "PK_NAME" PRIMARY KEY ("EMP_FIRST_NAME") ENFORCED;
+
+----------------------------------------------
