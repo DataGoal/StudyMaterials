@@ -51,6 +51,22 @@ def process_ddl_statements(input_file, output_file):
             else:
                 continue
 
+def process_ddl_statements(input_file, output_file):
+    start_pattern = "-- DDL Statements for Table \"STAGE\""
+    end_pattern = '-----------'
+    needed_lines = False
+
+    with open(input_file, 'r') as infile, open(output_file, 'w') as outfile:
+        for line in infile:
+            if line.startswith(start_pattern):
+                needed_lines = True
+                outfile.write(line)  # Print the current line
+            elif end_pattern in line:
+                needed_lines = False  # Stop printing until the next '-- DDL Statements for Table "STAGE"'
+            elif print_lines:
+                outfile.write(line)  # Print the following lines until the delimiter is encountered
+            else:
+                continue
 
 # Example usage:
 input_filename = 'C:\\Users\\bbala\\Downloads\\input_ddl.txt'
