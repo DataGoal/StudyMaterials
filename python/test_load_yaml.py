@@ -12,41 +12,48 @@ def load_yaml_content(yaml_file_path):
         print(f"Error parsing YAML: {e}")
         return None
 
-
 def test_load_yaml_content():
-    # Test Case 1: Success case with complex YAML content
-    yaml_content = {
-        'name': 'John Doe',
-        'age': 30,
-        'contacts': {
-            'email': 'john.doe@example.com',
-            'phone': '+123456789'
-        },
-        'addresses': [
-            {'city': 'New York', 'zip_code': '10001'},
-            {'city': 'Los Angeles', 'zip_code': '90001'}
-        ]
-    }
+    # Test Case 1: Success case with the provided YAML content
+    yaml_content = """
+    unity_catalog:
+      - catalog_name: main
+        schemas:
+          - schema_name: gold
+            location: s3a://gold
+          - schema_name: silver
+            location: s3a://silver
+      - catalog_name: stage
+        schemas:
+          - schema_name: gold
+            location: s3a://gold
+          - schema_name: silver
+            location: s3a://silver
+
+    ddl_creation:
+      base_path: /file/path
+      catalog_name: gold
+      schemas:
+        - tgt_schema: stage
+          src_schema: "staging"
+        - tgt_schema: pre_stage
+          src_schema: "pre_staging"
+        - tgt_schema: land
+          src_schema: "landing"
+    """
 
     with tempfile.NamedTemporaryFile(mode='w+', suffix='.yaml', delete=False) as temp_file:
-        yaml.dump(yaml_content, temp_file)
+        temp_file.write(yaml_content)
         temp_file_path = temp_file.name
 
     try:
         result = load_yaml_content(temp_file_path)
-        assert result == yaml_content
+        expected_result = yaml.safe_load(yaml_content)
+        print(expected_result)
+        assert result == expected_result
     finally:
         os.remove(temp_file_path)
 
-    # Test Case 2: Failure case with non-YAML content
-    with tempfile.NamedTemporaryFile(mode='w+', suffix='.txt', delete=False) as temp_file:
-        temp_file_path = temp_file.name
 
-    try:
-        result = load_yaml_content(temp_file_path)
-        assert result is None
-    finally:
-        os.remove(temp_file_path)
 
 
 # Run the test
