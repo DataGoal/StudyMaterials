@@ -1,21 +1,60 @@
-def extract_text_between_brackets(input_string):
-    open_bracket_index = input_string.find('(')
+import yaml
 
-    if open_bracket_index != -1:
-        close_bracket_index = input_string.find(')', open_bracket_index)
+# Load YAML file
+with open('C:\\Users\\bbala\\Desktop\\BBC\\GIT\\StudyMaterials\\inputs\\config.yaml', 'r') as file:
+    data = yaml.safe_load(file)
 
-        if close_bracket_index != -1:
-            extracted_text = input_string[open_bracket_index:close_bracket_index + 1]
-            return extracted_text
+# Function to generate SQL statements
+def generate_sql(catalog):
+    sql_statements = []
+    for entry in catalog:
+        # entry is the catalog name, not a dictionary
+        catalog_name = entry
+        sql_statements.append(f'USE CATALOG {catalog_name};')
+        for schema in catalog[entry]:
+            schema_name = schema['schema_name']
+            location = schema['location']
+            sql_statements.append(f'CREATE SCHEMA {schema_name} LOCATION {location};')
+    return sql_statements
 
-    return None
+# Generate and print SQL statements
+for catalog in data['unity_catalog']:
+    catalog_name = catalog.get('catalog_name')
+    schemas = catalog.get('schemas')
+
+    for schema in schemas:
+        schema_name = schema.get('schema_name', '')
+        location = schema.get('location')
+        print(f'{catalog_name}.{schema_name}.{location}')
+
+import yaml
+
+# Your provided YAML data
+yaml_data = """
+ddl_creation:
+  base_path: /file/path
+  catalog_name: gold
+  schemas:
+    - tgt_schema: stage
+      src_schema: "staging  "
+    - tgt_schema: pre_stage
+      src_schema: "pre_staging"
+    - tgt_schema: land
+      src_schema: "landing"
+"""
+
+# Load YAML data
+data = yaml.safe_load(yaml_data)
+
+# Extract relevant information and build the dictionary
+ddl_dict = {schema['tgt_schema']: schema['src_schema'].strip() for schema in data['ddl_creation']['schemas']}
+
+# Print the resulting dictionary
+print(ddl_dict)
+
+ddl_dict = {'stage': 'staging', 'pre_stage': 'pre_staging', 'land': 'landing'}
+
+for key, value in ddl_dict.items():
+    print(f"{key}: {value}")
 
 
-# Example usage
-input_string = 'My name is (Bob, and my age is (10), living in (Marsh)) and whats up'
-result = extract_text_between_brackets(input_string)
-
-if result:
-    print(result)
-else:
-    print("No matching brackets found.")

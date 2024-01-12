@@ -1,5 +1,8 @@
 import re
 
+import yaml
+
+
 def convert_ddl(input_ddl, datatype_map):
     # Extract table name
     table_name_match = re.search(r'CREATE TABLE (\w+)', input_ddl)
@@ -22,6 +25,40 @@ def convert_ddl(input_ddl, datatype_map):
 
     return output_ddl
 
+
+def load_table(p_map, t_list):
+    for t in t_list:
+        if t in p_map:
+            p_cols = p_map[t]
+            print(f"{p_cols} - - Loading")
+        else:
+            print("Not Loading")
+
+
+def process_values(input_string):
+    # Assuming input_string is a comma-separated string
+    values = input_string.split(',')
+
+    # Now 'values' is a list containing individual values
+    print(values)
+
+
+def load_yaml_contenet(yaml_file_path):
+    try:
+        with open(yaml_file_path, 'r') as file:
+            yaml_content = yaml.safe_load(file)
+        return yaml_content
+    except yaml.YAMLError as e:
+        print(f"Error parsing YAML: {e}")
+        return None
+
+
+# Example usage
+comma_separated_values = "value1,value2,value3"
+print(process_values(comma_separated_values))
+
+load_table({"foo":"bar", "kal":"lak", "jav": "vaj"},["foo", "jav", "bal"])
+
 # Input DDL
 input_ddl = '''
 CREATE TABLE Persons (
@@ -43,4 +80,4 @@ datatype_map = {
 output_ddl = convert_ddl(input_ddl, datatype_map)
 
 # Print the result
-print(output_ddl)
+print(load_table)

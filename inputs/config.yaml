@@ -1,0 +1,24 @@
+unity_catalog:
+  - catalog_name: main
+    schemas:
+      - schema_name: gold
+        location: s3a://gold
+      - schema_name: silver
+        location: s3a://silver
+  - catalog_name: stage
+    schemas:
+      - schema_name: gold
+        location: s3a://gold
+      - schema_name: silver
+        location: s3a://silver
+
+ddl_creation:
+  base_path: /file/path
+  catalog_name: gold
+  schemas:
+    - tgt_schema: stage
+      src_schema: "staging  "
+    - tgt_schema: pre_stage
+      src_schema: "pre_staging"
+    - tgt_schema: land
+      src_schema: "landing"
