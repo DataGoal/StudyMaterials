@@ -1,0 +1,40 @@
+catalog_name: db
+src_schema_name: gold
+src_table_name: emp_table
+src_alias_name: alias_emp_table
+flags:
+  - cntry_flag:
+      flag_name: COUNTRY_EXIST_FLAG
+      reference_schema_name: silver
+      reference_table_name: sal_table
+      ref_alias_name: alias_sal_table
+      column_name: COUNTRY_CODE
+      join_type: left outer
+      join_keys:
+        foo: bar
+        dog: cat
+  - state_flag:
+      flag_name: STATE_EXIST_FLAG
+      reference_schema_name: silver
+      reference_table_name: rav_table
+      ref_alias_name: alias_rav_table
+      column_name: STATE_CODE
+      join_type: left outer
+      join_keys:
+        food: bond
+        gan: nag
+
+
+SELECT alias_emp_table.*,
+CASE WHEN alias_sal_table.COUNTRY_CODE IS NOT NULL THEN 'Y' ELSE 'N' END AS COUNTRY_EXIST_FLAG,
+CASE WHEN alias_rav_table.STATE_CODE IS NOT NULL THEN 'Y' ELSE 'N' END AS STATE_EXIST_FLAG
+FROM db.gold.emp_table alias_emp_table
+left outer JOIN db.silver.sal_table alias_sal_table ON alias_emp_table.foo = alias_sal_table.bar AND alias_emp_table.dog = alias_sal_table.cat
+left outer JOIN db.silver.rav_table alias_rav_table ON alias_emp_table.food = alias_rav_table.bond AND alias_emp_table.gan = alias_rav_table.nag  ;
+
+SELECT alias_emp_table.*,
+CASE WHEN alias_sal_table.COUNTRY_CODE IS NOT NULL THEN 'Y' ELSE 'N' END AS COUNTRY_EXIST_FLAG,
+CASE WHEN alias_rav_table.STATE_CODE IS NOT NULL THEN 'Y' ELSE 'N' END AS STATE_EXIST_FLAG
+FROM db.gold.emp_table alias_emp_table
+left outer JOIN db.silver.sal_table alias_sal_table ON alias_emp_table.foo = alias_sal_table.bar AND alias_emp_table.dog = alias_sal_table.cat
+left outer JOIN db.silver.rav_table alias_rav_table ON alias_emp_table.food = alias_rav_table.bond AND alias_emp_table.gan = alias_rav_table.nag;
