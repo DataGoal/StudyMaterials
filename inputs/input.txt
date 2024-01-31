@@ -1,6 +1,16 @@
-ALTER TABLE tabname1 ADD CONSTRAINT oogway PRIMARY KEY(ID, NAME);
-ALTER TABLE tabname1 ADD CONSTRAINT kanna PRIMARY KEY(ID, NAME);
-ALTER TABLE tabname1 ADD CONSTRAINT oogway PRIMARY KEY(ID, NAME);
-ALTER TABLE tabname1 ADD CONSTRAINT hadvv PRIMARY KEY(ID, NAME);
-ALTER TABLE tabname1 ADD CONSTRAINT amara PRIMARY KEY(ID, NAME);
-ALTER TABLE tabname1 ADD CONSTRAINT oogway PRIMARY KEY(ID, NAME);
+dfsfc dfs
+asdfvf
+CREATE VIEW SQLVIEW_1 (
+afds
+adfs);
+fsdfs
+CREATE VIEW SQLVIEW_2 ();
+CREATE VIEW "SQLVIEW_3" ();
+asdffad
+CREATE VIEW gold.stage (
+dsa, asdf, dsf);
+CREATE VIEW gold.prestage();
+CREATE VIEW silver.emp();
+adsf
+CREATE VIEW bronze.sal();
+areg
