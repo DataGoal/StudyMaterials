@@ -1,23 +1,26 @@
 import os
 import shutil
+import filecmp
 
-def copy_modified_files(source, destination):
-    for root, dirs, files in os.walk(source):
+def copy_modified_files(src, dest):
+    for root, dirs, files in os.walk(src):
+        relative_path = os.path.relpath(root, src)
+        destination_path = os.path.join(dest, relative_path)
+
+        # Create directories if not exist in the destination
+        os.makedirs(destination_path, exist_ok=True)
+
         for file in files:
-            source_path = os.path.join(root, file)
-            relative_path = os.path.relpath(source_path, source)
-            destination_path = os.path.join(destination, relative_path)
+            src_file_path = os.path.join(root, file)
+            dest_file_path = os.path.join(destination_path, file)
 
-            # Check if the file in the source has been modified or does not exist in the destination
-            if not os.path.exists(destination_path) or os.path.getmtime(source_path) > os.path.getmtime(destination_path):
-                shutil.copy2(source_path, destination_path)
-                print(f"Copied: {relative_path}")
+            # Check if file exists and is modified
+            if not os.path.exists(dest_file_path) or filecmp.cmp(src_file_path, dest_file_path) == False:
+                shutil.copy2(src_file_path, dest_file_path)
+                print(f"Copied: {src_file_path} to {dest_file_path}")
 
-# Source directory to copy
-source_directory = "/path/to/source_directory"
+# Example usage
+src_path = '/path/to/source'
+dest_path = '/path/to/destination'
 
-# Destination directory
-destination_directory = "/path/to/destination_directory"
-
-# Copy only modified files
-copy_modified_files(source_directory, destination_directory)
+copy_modified_files(src_path, dest_path)
