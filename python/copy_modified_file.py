@@ -24,3 +24,29 @@ src_path = '/path/to/source'
 dest_path = '/path/to/destination'
 
 copy_modified_files(src_path, dest_path)
+
+def extract_content_between_triple_quotes(file_path):
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+
+    result = []
+    in_quotes = False
+    current_line = ""
+
+    for line in lines:
+        if '"""' in line:
+            if in_quotes:
+                result.append(current_line.strip())
+                current_line = ""
+            in_quotes = not in_quotes
+        elif in_quotes:
+            current_line += line
+
+    return result
+
+file_path = 'path/to/your/textfile.txt'
+extracted_content = extract_content_between_triple_quotes(file_path)
+
+for line in extracted_content:
+    print(line)
+
