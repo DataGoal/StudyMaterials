@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS emp(emp_name string null, emp_no bigint not null generated always as identity);
+CREATE TABLE IF NOT EXISTS emp(emp_name string null, emp_no bigint not null generated always as identity, emp_val bigint null generated always as identity);
 CREATE TABLE IF NOT EXISTS cus(cus_name string not null, cus_no bigint, s_no bigint not null generated always as identity);
 CREATE TABLE IF NOT EXISTS rev(rev_name string null, emp_no bigint null);
 
