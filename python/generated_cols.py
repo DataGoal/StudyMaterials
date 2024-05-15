@@ -1,22 +1,22 @@
 import re
 
 def extract_generated_columns(input_file):
-    generated_columns = []
     with open(input_file, 'r') as file:
         for line in file:
-            match = re.search(r'CREATE TABLE (\w+) \((.*?)\)', line)
-            if match:
-                table_name = match.group(1)
-                columns = match.group(2).split(',')
-                for column in columns:
-                    if 'generated always as identity' in column:
-                        column_name = re.search(r'(\w+)\s', column).group(1)
-                        generated_columns.append((table_name.strip(), column_name.strip()))
-    return generated_columns
+            # Extract table name
+            table_match = re.match(r'^CREATE TABLE IF NOT EXISTS (\w+)\(', line)
+            if table_match:
+                table_name = table_match.group(1)
+                generated_columns = []
 
+                # Extract generated columns
+                columns = re.findall(r'(\w+)\s+\w+\s+generated always as identity', line)
+                generated_columns.extend(columns)
+
+                if generated_columns:
+                    print(f"{table_name}, {', '.join(generated_columns)}")
+
+# Usage
 input_file = "C:\\Users\\bbala\\Desktop\\BBC\\GIT\\StudyMaterials\\inputs\\input.txt"
-generated_columns = extract_generated_columns(input_file)
-
-for table, column in generated_columns:
-    print(table + ",", column)
+extract_generated_columns(input_file)
 
