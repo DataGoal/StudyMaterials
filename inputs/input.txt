@@ -1,16 +1,3 @@
-dfsfc dfs
-asdfvf
-CREATE VIEW SQLVIEW_1 (
-afds
-adfs);
-fsdfs
-CREATE VIEW SQLVIEW_2 ();
-CREATE VIEW "SQLVIEW_3" ();
-asdffad
-CREATE VIEW gold.stage (
-dsa, asdf, dsf);
-CREATE VIEW gold.prestage();
-CREATE VIEW silver.emp();
-adsf
-CREATE VIEW bronze.sal();
-areg
+CREATE TABLE emp (emp_name string, emp_no bigint generated always as identity);
+CREATE TABLE cus (cus_name string, cus_no bigint, s_no bigint generated always as identity);
+CREATE TABLE rev (rev_name string, emp_no bigint);
