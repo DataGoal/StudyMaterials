@@ -1,54 +1,40 @@
 from pyspark.sql import SparkSession
-from pyspark.sql import Row
-from pyspark.sql.types import StringType, BooleanType, StructField, StructType
+from pyspark.sql.functions import lit
 
 
-def compare_fields_pyspark(val1, val2):
+def compare_schemas(val1, val2):
     # Initialize Spark session
-    spark = SparkSession.builder.appName("FieldComparison").getOrCreate()
+    spark = SparkSession.builder.master("local").appName("Schema Comparison").getOrCreate()
 
-    # Convert input lists to dictionaries for easy lookup
-    dict1 = {item[0]: item[1] for item in val1}
-    dict2 = {item[0]: item[1] for item in val2}
+    # Convert the input lists to DataFrames
+    df1 = spark.createDataFrame(val1, ["field_name", "data_type"])
+    df2 = spark.createDataFrame(val2, ["field_name", "data_type"])
 
-    # Find all unique field names from both dictionaries
-    all_fields = set(dict1.keys()).union(set(dict2.keys()))
+    # Add a source column to distinguish between the two DataFrames
+    df1 = df1.withColumn("source", lit("df1"))
+    df2 = df2.withColumn("source", lit("df2"))
 
-    # Prepare the comparison list
-    comparison = []
-    for field in all_fields:
-        df1_field_name = field if field in dict1 else 'NA'
-        df1_datatype = dict1[field].__name__ if field in dict1 else 'NA'
-        df2_field_name = field if field in dict2 else 'NA'
-        df2_datatype = dict2[field].__name__ if field in dict2 else 'NA'
-        field_cmp = df1_field_name == df2_field_name
-        datatype_cmp = df1_datatype == df2_datatype
-        comparison.append((df1_field_name, df1_datatype, df2_field_name, df2_datatype, field_cmp, datatype_cmp))
+    # Perform a full outer join on the field_name column
+    joined_df = df1.join(df2, df1.field_name == df2.field_name, "full_outer") \
+        .select(df1["field_name"].alias("df1_field_name"), df1["data_type"].alias("df1_datatype"),
+                df2["field_name"].alias("df2_field_name"), df2["data_type"].alias("df2_datatype"))
 
-    # Convert comparison list to Row objects
-    rows = [
-        Row(df1_field_name=row[0], df1_datatype=row[1], df2_field_name=row[2], df2_datatype=row[3], field_cmp=row[4],
-            datatype_cmp=row[5]) for row in comparison]
+    # Fill NA values for missing fields in the join
+    joined_df = joined_df.fillna("NA")
 
-    # Define the schema for the PySpark DataFrame
-    schema = StructType([
-        StructField("df1_field_name", StringType(), True),
-        StructField("df1_datatype", StringType(), True),
-        StructField("df2_field_name", StringType(), True),
-        StructField("df2_datatype", StringType(), True),
-        StructField("field_cmp", BooleanType(), True),
-        StructField("datatype_cmp", BooleanType(), True)
-    ])
+    # Add comparison columns
+    joined_df = joined_df.withColumn("field_cmp", (joined_df["df1_field_name"] == joined_df["df2_field_name"])) \
+        .withColumn("datatype_cmp", (joined_df["df1_datatype"] == joined_df["df2_datatype"]))
 
-    # Create a Spark DataFrame
-    df = spark.createDataFrame(rows, schema)
+    # Show the result
+    joined_df.show()
 
-    return df
+    return joined_df
 
 
-# Example usage
-val1 = [('emp_name', str), ('emp_id', int), ('emp_adrs', str)]
-val2 = [('emp_name', str), ('emp_id', str), ('cus_name', str)]
+# Define the input lists
+val1 = [('emp_name', 'string'), ('emp_id', 'int'), ('emp_adrs', 'string')]
+val2 = [('emp_name', 'string'), ('emp_id', 'string'), ('cus_name', 'string')]
 
-df = compare_fields_pyspark(val1, val2)
-df.show()
+# Call the function with the input lists
+compare_schemas(val1, val2)
