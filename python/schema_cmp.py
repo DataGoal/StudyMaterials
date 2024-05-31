@@ -23,7 +23,12 @@ def compare_fields_pyspark(val1, val2):
         df2_datatype = dict2[field].__name__ if field in dict2 else 'NA'
         field_cmp = df1_field_name == df2_field_name
         datatype_cmp = df1_datatype == df2_datatype
-        comparison.append(Row(df1_field_name, df1_datatype, df2_field_name, df2_datatype, field_cmp, datatype_cmp))
+        comparison.append((df1_field_name, df1_datatype, df2_field_name, df2_datatype, field_cmp, datatype_cmp))
+
+    # Convert comparison list to Row objects
+    rows = [
+        Row(df1_field_name=row[0], df1_datatype=row[1], df2_field_name=row[2], df2_datatype=row[3], field_cmp=row[4],
+            datatype_cmp=row[5]) for row in comparison]
 
     # Define the schema for the PySpark DataFrame
     schema = StructType([
@@ -36,7 +41,7 @@ def compare_fields_pyspark(val1, val2):
     ])
 
     # Create a Spark DataFrame
-    df = spark.createDataFrame(comparison, schema)
+    df = spark.createDataFrame(rows, schema)
 
     return df
 
