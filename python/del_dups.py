@@ -20,3 +20,14 @@ input_file_path = 'C:\\Users\\bbala\\Desktop\\BBC\\GIT\\StudyMaterials\\inputs\\
 output_file_path = 'C:\\Users\\bbala\\Desktop\\BBC\\GIT\\StudyMaterials\\inputs\\output_2.csv'
 
 process_file(input_file_path, output_file_path)
+
+UPDATE eventmetadata.event_reference AS er
+SET EXPRTN_DT = current_date,
+    UPDT_TS = current_timestamp,
+    UPDT_USER_CD = current_user
+FROM eventmetadata.event_output_reference AS eor
+JOIN eventmetadata.output_reference AS orf ON eor.output_id = orf.output_id
+WHERE CURRENT_DATE BETWEEN er.EFF_DT AND er.EXPRTN_DT
+  AND er.EVENT_ID = eor.EVENT_ID
+  AND LOWER(orf.output_grp_nm) LIKE '%cog%';
+
