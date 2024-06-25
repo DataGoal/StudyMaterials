@@ -31,3 +31,26 @@ WHERE CURRENT_DATE BETWEEN er.EFF_DT AND er.EXPRTN_DT
   AND er.EVENT_ID = eor.EVENT_ID
   AND LOWER(orf.output_grp_nm) LIKE '%cog%';
 
+import os
+
+# Directory where the search starts
+start_dir = '/etc/tmp'
+# Output file where all contents will be appended
+output_file = '/path/to/output_file.txt'
+
+# Ensure the output file is empty before appending
+with open(output_file, 'w') as f_out:
+    f_out.write("")
+
+# Walk through the directory structure
+for root, dirs, files in os.walk(start_dir):
+    for file in files:
+        if file == 'col_info.txt':
+            file_path = os.path.join(root, file)
+            with open(file_path, 'r') as f_in:
+                content = f_in.read()
+                with open(output_file, 'a') as f_out:
+                    f_out.write(content + "\n")
+
+print("All contents have been appended to:", output_file)
+
