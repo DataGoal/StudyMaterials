@@ -35,3 +35,25 @@ csv_file_path = 'output.csv'  # Desired CSV output file path
 json_to_csv(json_file_path, csv_file_path)
 
 print(f"JSON data has been written to {csv_file_path}")
+
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import split, when, col
+
+# Initialize SparkSession
+spark = SparkSession.builder.appName("SplitEventColumn").getOrCreate()
+
+# Sample data with and without '='
+data = [("date=0102",), ("date=0103",), ("date=0104",), ("0105",), ("0106",)]
+columns = ["event"]
+
+# Create DataFrame
+df = spark.createDataFrame(data, columns)
+
+# Split the 'event' column by '=' and handle cases without '='
+df = df.withColumn(
+    "event",
+    when(col("event").contains("="), split(col("event"), "=").getItem(1)).otherwise(col("event"))
+)
+
+# Show the resulting DataFrame
+df.show()
