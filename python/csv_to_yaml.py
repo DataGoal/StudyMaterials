@@ -1,49 +1,54 @@
-import csv
+import pandas as pd
 import yaml
 
-# Define the input CSV file path
-csv_file = "C:\\Users\\bbala\\Desktop\\BBC\\GIT\\StudyMaterials\\inputs\\access_control.csv"
+# Define the input Excel file path
+excel_file = "input.xlsx"
 
-# Initialize an empty list to hold the table data
-table_list = []
+# Define the sheet names
+environments = ["dev", "sit", "prd"]
 
-# Read the CSV file
-with open(csv_file, mode='r') as file:
-    reader = csv.DictReader(file)
+# Initialize a dictionary to hold the data for all environments
+output_dict = {}
 
-    for row in reader:
+# Iterate over each environment, read the respective sheet, and collect the data
+for sheet_name in environments:
+    # Read the Excel sheet into a DataFrame
+    df = pd.read_excel(excel_file, sheet_name=sheet_name)
+
+    # Initialize an empty list to hold the table data for the current environment
+    table_list = []
+
+    # Iterate over each row in the DataFrame
+    for index, row in df.iterrows():
         # Create a dictionary for each table
         table_dict = {}
         table_name = row['Table Name']
         table_dict[table_name] = []
 
         # Parse the 'Select' groups
-        if row['Select']:
+        if pd.notna(row['Select']):
             select_groups = row['Select'].split(' | ')
             table_dict[table_name].append({'select': select_groups})
 
         # Parse the 'Modify' groups
-        if row['Modify']:
+        if pd.notna(row['Modify']):
             modify_groups = row['Modify'].split(' | ')
             table_dict[table_name].append({'modify': modify_groups})
 
         # Parse the 'All_Privileges' groups
-        if row['All_Privileges']:
+        if pd.notna(row['All_Privileges']):
             all_privilege_groups = row['All_Privileges'].split(' | ')
             table_dict[table_name].append({'all_privileage': all_privilege_groups})
 
         # Add the table dictionary to the table list
         table_list.append(table_dict)
 
-# Convert the list to a dictionary under the key 'table_list'
-output_dict = {'table_list': table_list}
+    # Add the table list to the output dictionary under the current environment tag
+    output_dict[sheet_name] = {'table_list': table_list}
 
-# Output the dictionary as YAML
-yaml_output = yaml.dump(output_dict, default_flow_style=False)
+# Write the entire output dictionary to a single YAML file
+yaml_file = "combined_output.yaml"
+with open(yaml_file, 'w') as file:
+    yaml.dump(output_dict, file, default_flow_style=False)
 
-# Print the YAML output or write to a file
-print(yaml_output)
-
-# Optionally, write to a YAML file
-with open('output.yaml', 'w') as yaml_file:
-    yaml.dump(output_dict, yaml_file, default_flow_style=False)
+print(f"Combined YAML output has been written to {yaml_file}")
