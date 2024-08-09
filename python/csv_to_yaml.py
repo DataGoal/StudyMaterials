@@ -112,39 +112,43 @@ import yaml
 from pyspark.sql import SparkSession
 
 
-def apply_grants_from_yaml(yaml_file, spark: SparkSession):
+def apply_grants_from_yaml(yaml_file, spark: SparkSession, environment: str):
     # Read the YAML file
     with open(yaml_file, 'r') as file:
         data = yaml.safe_load(file)
 
+    # Check if the specified environment exists in the YAML data
+    if environment not in data:
+        print(f"Environment '{environment}' not found in the YAML file.")
+        return
+
     # Initialize a list to collect SQL statements
     sql_statements = []
 
-    # Process each environment in the YAML data
-    for environment, content in data.items():
-        table_list = content['table_list']
+    # Process the specified environment in the YAML data
+    table_list = data[environment]['table_list']
 
-        # Process each table
-        for table in table_list:
-            table_name, permissions = list(table.items())[0]
+    # Process each table
+    for table in table_list:
+        table_name, permissions = list(table.items())[0]
 
-            # Generate GRANT statements
-            for permission in permissions:
-                for perm_type, groups in permission.items():
-                    for group in groups:
-                        if perm_type == 'select':
-                            sql_statements.append(f"GRANT SELECT ON TABLE {table_name} TO {group};")
-                        elif perm_type == 'modify':
-                            sql_statements.append(f"GRANT MODIFY ON TABLE {table_name} TO {group};")
-                        elif perm_type == 'all_privileage':
-                            sql_statements.append(f"GRANT ALL PRIVILEGE ON TABLE {table_name} TO {group};")
+        # Generate GRANT statements
+        for permission in permissions:
+            for perm_type, groups in permission.items():
+                for group in groups:
+                    if perm_type == 'select':
+                        sql_statements.append(f"GRANT SELECT ON TABLE {table_name} TO {group};")
+                    elif perm_type == 'modify':
+                        sql_statements.append(f"GRANT MODIFY ON TABLE {table_name} TO {group};")
+                    elif perm_type == 'all_privileage':
+                        sql_statements.append(f"GRANT ALL PRIVILEGE ON TABLE {table_name} TO {group};")
 
     # Execute all SQL statements in a batch
     try:
         for sql in sql_statements:
             print(f"Executing: {sql}")  # For debugging, remove in production
             spark.sql(sql)
-        print("All grants applied successfully.")
+        print(f"Grants applied successfully for environment '{environment}'.")
     except Exception as e:
         print(f"An error occurred: {e}")
 
@@ -155,5 +159,5 @@ spark = SparkSession.builder \
     .appName("Grant Permissions") \
     .getOrCreate()
 
-# Apply grants from YAML
-apply_grants_from_yaml('combined_output.yaml', spark)
+# Apply grants for a specific environment from YAML
+apply_grants_from_yaml('combined_output.yaml', spark, 'dev')
