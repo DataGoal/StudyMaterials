@@ -1,0 +1,4 @@
+Table Name,Select,Modify,All_Privileges
+employee_table_1,group_1 | group_2,group_1,group_3
+employee_table_2,group_1 | group_2,group_1,group_2
+employee_table_3,group_1 | group_2,group_1,group_4
